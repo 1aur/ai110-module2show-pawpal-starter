@@ -52,6 +52,21 @@ Paste a sample of your app's CLI or Streamlit output here so a reader can see wh
 #   08:00 — Morning walk (30 min) [priority: high]
 #   09:00 — Feeding (10 min) [priority: high]
 #   ...
+
+```
+Today's Schedule
+================
+Owner: Jordan
+Available time: 75 minutes
+
+Scheduled Tasks:
+1. Mochi - Breakfast (10 min, priority: high, frequency: daily)
+2. Luna - Medication (15 min, priority: high, frequency: daily)
+3. Mochi - Morning walk (30 min, priority: high, frequency: daily)
+4. Luna - Brush fur (20 min, priority: medium, frequency: daily)
+
+Reasoning:
+Scheduled 4 task(s) using 75 minute(s). 0 minute(s) remain. Tasks were prioritized by completion status, priority, and shorter duration.
 ```
 
 ## 🧪 Testing PawPal+

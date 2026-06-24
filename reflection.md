@@ -24,6 +24,10 @@ The main classes I planned to include were an `Owner` class, a `Pet` class, a `C
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
 
+The main relationships were mostly represented: an `Owner` can have multiple `Pet` objects, and each `Pet` can have multiple `CareTask` objects. One possible improvement is that the `Scheduler` currently only receives a list of tasks and available time, instead of directly connecting to an `Owner` or `Pet`. This keeps the scheduler simple, but it may make it harder later to explain which pet the schedule belongs to.
+
+I also noticed a few possible logic bottlenecks. Priority is stored as a string, so the scheduler will need a method like `get_priority_value()` to convert priorities into sortable values. Time is also stored as strings, which is simple for now but may need to be converted later if I build more detailed time slots. I decided not to add a separate `DailyPlan` class yet because the current project can still work with the four main classes, but I may add one later if the schedule output becomes more complex.
+
 ---
 
 ## 2. Scheduling Logic and Tradeoffs
