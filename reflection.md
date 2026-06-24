@@ -42,6 +42,8 @@ I also noticed a few possible logic bottlenecks. Priority is stored as a string,
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
 
+One tradeoff my scheduler makes is that conflict detection only checks for exact preferred-time matches, such as two tasks both starting at `10:00`. It does not yet calculate whether tasks overlap based on duration, such as one task running from `10:00` to `10:30` and another starting at `10:15`. I kept the conflict detection lightweight because this version of PawPal+ is focused on a simple daily planning workflow, and exact-time warnings are easier to understand and verify in the terminal. This approach is reasonable for the project because it catches obvious scheduling issues without making the algorithm too complex too early.
+
 ---
 
 ## 3. AI Collaboration

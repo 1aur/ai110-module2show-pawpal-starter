@@ -44,16 +44,40 @@ pip install -r requirements.txt
 
 ## 🖥️ Sample Output
 
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+Running `python main.py` prints:
 
-```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
+```text
+Tasks Sorted By Time
+--------------------
+1. 07:30 - Luna: Medication (15 min, priority: high, frequency: daily, done)
+2. 08:00 - Mochi: Morning walk (30 min, priority: high, frequency: daily, not done)
+3. 09:00 - Mochi: Breakfast (10 min, priority: high, frequency: daily, done)
+4. 09:00 - Mochi: Breakfast (10 min, priority: high, frequency: daily, not done)
+5. 10:00 - Mochi: Evening enrichment (25 min, priority: medium, frequency: daily, not done)
+6. 10:00 - Luna: Brush fur (20 min, priority: medium, frequency: daily, not done)
 
-```
+Mochi's Tasks
+-------------
+1. 10:00 - Mochi: Evening enrichment (25 min, priority: medium, frequency: daily, not done)
+2. 09:00 - Mochi: Breakfast (10 min, priority: high, frequency: daily, done)
+3. 08:00 - Mochi: Morning walk (30 min, priority: high, frequency: daily, not done)
+4. 09:00 - Mochi: Breakfast (10 min, priority: high, frequency: daily, not done)
+
+Incomplete Tasks
+----------------
+1. 10:00 - Mochi: Evening enrichment (25 min, priority: medium, frequency: daily, not done)
+2. 08:00 - Mochi: Morning walk (30 min, priority: high, frequency: daily, not done)
+3. 09:00 - Mochi: Breakfast (10 min, priority: high, frequency: daily, not done)
+4. 10:00 - Luna: Brush fur (20 min, priority: medium, frequency: daily, not done)
+
+Conflict Warnings
+-----------------
+- Conflict at 10:00: Mochi: Evening enrichment, Luna: Brush fur
+
+Recurring Task Created
+----------------------
+Breakfast was recreated for 2026-06-24.
+
 Today's Schedule
 ================
 Owner: Jordan
@@ -61,12 +85,16 @@ Available time: 75 minutes
 
 Scheduled Tasks:
 1. Mochi - Breakfast (10 min, priority: high, frequency: daily)
-2. Luna - Medication (15 min, priority: high, frequency: daily)
-3. Mochi - Morning walk (30 min, priority: high, frequency: daily)
-4. Luna - Brush fur (20 min, priority: medium, frequency: daily)
+2. Mochi - Morning walk (30 min, priority: high, frequency: daily)
+3. Luna - Brush fur (20 min, priority: medium, frequency: daily)
+
+Unscheduled Tasks:
+- Mochi - Evening enrichment (25 min, priority: medium)
+- Mochi - Breakfast (10 min, priority: high)
+- Luna - Medication (15 min, priority: high)
 
 Reasoning:
-Scheduled 4 task(s) using 75 minute(s). 0 minute(s) remain. Tasks were prioritized by completion status, priority, and shorter duration.
+Scheduled 3 task(s) using 60 minute(s). 15 minute(s) remain. Tasks were prioritized by completion status, priority, and shorter duration. 3 task(s) were not scheduled because they were completed or did not fit.
 ```
 
 ## 🧪 Testing PawPal+
@@ -87,14 +115,12 @@ Sample test output:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `Scheduler.sort_by_time()` and `Scheduler.sort_tasks_by_priority()` | Sorts tasks by preferred time for timeline views and by priority/duration for daily planning. |
+| Filtering | `Scheduler.filter_tasks_by_pet()` and `Scheduler.filter_tasks_by_completion()` | Lets the system show tasks for one pet or separate completed and incomplete tasks. |
+| Conflict handling | `Scheduler.detect_conflicts()` | Returns warning messages when two incomplete tasks share the same preferred time. |
+| Recurring tasks | `CareTask.create_next_occurrence()` and `Scheduler.mark_task_complete()` | When a recurring daily or weekly task is completed, the next task is created using `timedelta`. |
 
 ## 📸 Demo Walkthrough
 

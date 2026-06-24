@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 from typing import Optional
 
 
@@ -12,6 +13,7 @@ class CareTask:
     priority: str
     preferred_time: str = ""
     frequency: str = "daily"
+    due_date: Optional[date] = None
     is_completed: bool = False
     is_recurring: bool = False
     notes: str = ""
@@ -40,6 +42,7 @@ class CareTask:
             "priority": self.priority,
             "preferred_time": self.preferred_time,
             "frequency": self.frequency,
+            "due_date": self.due_date.isoformat() if self.due_date else "",
             "is_completed": self.is_completed,
             "is_recurring": self.is_recurring,
             "notes": self.notes,
@@ -52,6 +55,33 @@ class CareTask:
     def mark_incomplete(self) -> None:
         """Mark the task as incomplete."""
         self.is_completed = False
+
+    def create_next_occurrence(self) -> Optional["CareTask"]:
+        """Create the next recurring task based on the current frequency."""
+        if not self.is_recurring:
+            return None
+
+        current_due_date = self.due_date or date.today()
+
+        if self.frequency.lower() == "daily":
+            next_due_date = current_due_date + timedelta(days=1)
+        elif self.frequency.lower() == "weekly":
+            next_due_date = current_due_date + timedelta(weeks=1)
+        else:
+            return None
+
+        return CareTask(
+            task_name=self.task_name,
+            category=self.category,
+            duration_minutes=self.duration_minutes,
+            priority=self.priority,
+            preferred_time=self.preferred_time,
+            frequency=self.frequency,
+            due_date=next_due_date,
+            is_completed=False,
+            is_recurring=self.is_recurring,
+            notes=self.notes,
+        )
 
 
 @dataclass
@@ -172,6 +202,63 @@ class Scheduler:
             self.get_all_tasks(),
             key=lambda task: (task.is_completed, -task.get_priority_value(), task.duration_minutes),
         )
+
+    def sort_by_time(self) -> list[tuple[Pet, CareTask]]:
+        """Sort pet-task pairs by preferred time in HH:MM format."""
+        return sorted(
+            self.owner.get_all_task_items(),
+            key=lambda item: item[1].preferred_time or "23:59",
+        )
+
+    def filter_tasks_by_pet(self, pet_name: str) -> list[tuple[Pet, CareTask]]:
+        """Return pet-task pairs for one pet name."""
+        return [
+            (pet, task)
+            for pet, task in self.owner.get_all_task_items()
+            if pet.name.lower() == pet_name.lower()
+        ]
+
+    def filter_tasks_by_completion(self, is_completed: bool) -> list[tuple[Pet, CareTask]]:
+        """Return pet-task pairs matching a completion status."""
+        return [
+            (pet, task)
+            for pet, task in self.owner.get_all_task_items()
+            if task.is_completed == is_completed
+        ]
+
+    def mark_task_complete(self, pet_name: str, task_name: str) -> Optional[CareTask]:
+        """Mark a task complete and add its next occurrence if recurring."""
+        for pet, task in self.owner.get_all_task_items():
+            if pet.name.lower() == pet_name.lower() and task.task_name.lower() == task_name.lower():
+                task.mark_complete()
+                next_task = task.create_next_occurrence()
+                if next_task:
+                    pet.add_task(next_task)
+                return next_task
+
+        return None
+
+    def detect_conflicts(self) -> list[str]:
+        """Return warnings for tasks that share the same preferred time."""
+        tasks_by_time: dict[str, list[tuple[Pet, CareTask]]] = {}
+
+        for pet, task in self.owner.get_all_task_items():
+            if task.is_completed or not task.preferred_time:
+                continue
+            tasks_by_time.setdefault(task.preferred_time, []).append((pet, task))
+
+        warnings = []
+        for preferred_time, task_items in tasks_by_time.items():
+            if len(task_items) > 1:
+                task_names = [
+                    f"{pet.name}: {task.task_name}"
+                    for pet, task in task_items
+                ]
+                warnings.append(
+                    f"Conflict at {preferred_time}: " + ", ".join(task_names)
+                )
+
+        return warnings
 
     def can_fit_task(self, task: CareTask) -> bool:
         """Check whether a task fits in the remaining schedule time."""
