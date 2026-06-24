@@ -1,0 +1,52 @@
+classDiagram
+    class Owner {
+        -String name
+        -int availableTimeMinutes
+        -String preferredStartTime
+        -String preferences
+        +updateAvailableTime(minutes)
+        +updatePreferences(preferences)
+        +getOwnerInfo()
+    }
+
+    class Pet {
+        -String name
+        -String species
+        -String breed
+        -int age
+        -String specialNeeds
+        -List~CareTask~ tasks
+        +addTask(task)
+        +removeTask(taskName)
+        +getTasks()
+        +getPetInfo()
+    }
+
+    class CareTask {
+        -String taskName
+        -String category
+        -int durationMinutes
+        -String priority
+        -String preferredTime
+        -Boolean isRecurring
+        -String notes
+        +updateTask(name, duration, priority)
+        +getPriorityValue()
+        +getTaskInfo()
+    }
+
+    class Scheduler {
+        -List~CareTask~ tasks
+        -int availableTimeMinutes
+        -List~CareTask~ scheduledTasks
+        -List~CareTask~ unscheduledTasks
+        +sortTasksByPriority()
+        +canFitTask(task)
+        +generateDailyPlan()
+        +explainPlan()
+    }
+
+    Owner "1" --> "1..*" Pet : owns
+    Pet "1" --> "0..*" CareTask : has
+    Scheduler "1" --> "0..*" CareTask : schedules
+    Scheduler --> Owner : uses availability
